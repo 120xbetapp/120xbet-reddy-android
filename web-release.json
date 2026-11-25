@@ -1,8 +1,8 @@
 {
-  "versionCode": 3,
-  "versionName": "1.0.2-web",
+  "versionCode": 4,
+  "versionName": "1.0.3-web",
   "htmlUrl": "https://120xbetapp.github.io/120xbet-reddy-android/reddy-web/index.html",
-  "bytes": 78112,
-  "sha256": "fedf1dd17e8e7358e58274cc09a372fe3215dfb31947da29ef50a23a8145b15a",
-  "notes": "Chat list activity sorting, two-person group icon, chronological notices and session resume."
+  "bytes": 78371,
+  "sha256": "ac207a779fd76ab54c5c69500f7c4c6ac070d9b9df1f14dc01e1e4bf27906c83",
+  "notes": "Agent balance, room names and presence integration"
 }
