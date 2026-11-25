@@ -1,0 +1,8 @@
+{
+  "versionCode": 1,
+  "versionName": "1.0.0-web",
+  "htmlUrl": "https://120xbetapp.github.io/120xbet-reddy-android/reddy-web/index.html",
+  "bytes": 73924,
+  "sha256": "69e53f7bfd4e9c4f540530a2c0371d988a2ae710c40596593e19232cb55d1306",
+  "notes": "Removed duplicate HTML splash. Added in-app HTML updates."
+}
