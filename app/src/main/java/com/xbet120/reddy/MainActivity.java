@@ -78,6 +78,6 @@ public class MainActivity extends Activity {
   @Override protected void onActivityResult(int request,int result,Intent data){super.onActivityResult(request,result,data);
     if(request==PICK_FILE && uploadCallback!=null){uploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result,data));uploadCallback=null;}
   }
-  @Override public void onBackPressed(){if(web!=null&&web.canGoBack())web.goBack();else super.onBackPressed();}
+  @Override public void onBackPressed(){if(web==null){super.onBackPressed();return;} web.evaluateJavascript("typeof window.reddyBack === 'function' && window.reddyBack()", result -> {if(!"true".equals(result)){if(web.canGoBack())web.goBack();else finish();}});}
   @Override protected void onDestroy(){if(web!=null)web.destroy();super.onDestroy();}
 }
