@@ -1,8 +1,8 @@
 {
-  "versionCode": 2,
-  "versionName": "1.0.1-web",
+  "versionCode": 3,
+  "versionName": "1.0.2-web",
   "htmlUrl": "https://120xbetapp.github.io/120xbet-reddy-android/reddy-web/index.html",
-  "bytes": 76400,
-  "sha256": "1c055badf581b7cbf5f3fe82c3105389b62828b5466f1f8d91a43194cbbc48eb",
-  "notes": "Login wording, loading indicator, authorization dialog and exit navigation."
+  "bytes": 78112,
+  "sha256": "fedf1dd17e8e7358e58274cc09a372fe3215dfb31947da29ef50a23a8145b15a",
+  "notes": "Chat list activity sorting, two-person group icon, chronological notices and session resume."
 }
