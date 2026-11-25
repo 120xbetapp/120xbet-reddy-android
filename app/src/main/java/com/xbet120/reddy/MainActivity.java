@@ -108,6 +108,7 @@ public class MainActivity extends Activity {
         return loader.shouldInterceptRequest(u);
       }
       @Override public boolean shouldOverrideUrlLoading(WebView v,String url){
+      if("reddy-local://exit".equals(url)&&"https://appassets.androidplatform.net/assets/index.html".equals(v.getUrl())){finish();return true;}
       if(url.startsWith("https://")||url.startsWith("http://")){v.loadUrl(url);return true;}return false;
     }});
     web.setWebChromeClient(new WebChromeClient(){
@@ -126,6 +127,6 @@ public class MainActivity extends Activity {
   @Override protected void onActivityResult(int request,int result,Intent data){super.onActivityResult(request,result,data);
     if(request==PICK_FILE && uploadCallback!=null){uploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result,data));uploadCallback=null;}
   }
-  @Override public void onBackPressed(){if(web==null){super.onBackPressed();return;} web.evaluateJavascript("typeof window.reddyBack === 'function' && window.reddyBack()", result -> {if(!"true".equals(result)){if(web.canGoBack())web.goBack();else finish();}});}
+  @Override public void onBackPressed(){if(web==null){super.onBackPressed();return;} web.evaluateJavascript("typeof window.reddyBack === 'function' && window.reddyBack()", result -> {if("\"exit-confirm\"".equals(result)){web.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS);new android.app.AlertDialog.Builder(this).setIcon(R.drawable.splash_logo).setTitle("Reddy").setMessage("Do you want to exit the app?").setNegativeButton("Cancel",null).setPositiveButton("Exit",(d,w)->finish()).show();return;}if(!"true".equals(result)){if(web.canGoBack())web.goBack();else finish();}});}
   @Override protected void onDestroy(){updates.shutdown();if(web!=null)web.destroy();super.onDestroy();}
 }
