@@ -1,6 +1,4 @@
-
 package com.xbet120.reddy;
-
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,219 +22,62 @@ import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.net.Uri;
 import android.webkit.CookieManager;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends Activity {
-
-    private WebView web;
-    private FrameLayout root;
-    private ValueCallback<Uri[]> uploadCallback;
-
-    private static final int PICK_FILE = 42;
-
-    @Override
-    public void onCreate(Bundle state) {
-        super.onCreate(state);
-
-        createNotificationChannel();
-
-        if (Build.VERSION.SDK_INT >= 33 &&
-            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
-            != PackageManager.PERMISSION_GRANTED) {
-
-            requestPermissions(
-                new String[]{Manifest.permission.POST_NOTIFICATIONS},
-                73
-            );
-        }
-
-        getWindow().setStatusBarColor(Color.WHITE);
-        getWindow().setNavigationBarColor(Color.WHITE);
-
-        getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR |
-            View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
-        );
-
-        root = new FrameLayout(this);
-        root.setBackgroundColor(Color.WHITE);
-        setContentView(root);
-
-        ImageView splash = new ImageView(this);
-        splash.setImageResource(R.drawable.splash_logo);
-        splash.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        FrameLayout.LayoutParams sp =
-            new FrameLayout.LayoutParams(
-                dp(145),
-                dp(145),
-                Gravity.CENTER
-            );
-
-        root.addView(splash, sp);
-
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            root.removeView(splash);
-            showWeb();
-        }, 1350);
+  private WebView web; private FrameLayout root; private ValueCallback<Uri[]> uploadCallback;
+  private static final int PICK_FILE = 42;
+  @Override public void onCreate(Bundle state){super.onCreate(state);
+    createNotificationChannel();
+    if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=PackageManager.PERMISSION_GRANTED){requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},73);}
+    getWindow().setStatusBarColor(Color.WHITE);getWindow().setNavigationBarColor(Color.WHITE);
+    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+    root=new FrameLayout(this);root.setBackgroundColor(Color.WHITE);setContentView(root);
+    ImageView splash=new ImageView(this);splash.setImageResource(R.drawable.splash_logo);splash.setScaleType(ImageView.ScaleType.FIT_CENTER);
+    FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(dp(145),dp(145),Gravity.CENTER);root.addView(splash,sp);
+    new Handler(Looper.getMainLooper()).postDelayed(()->{root.removeView(splash);showWeb();},1350);
+  }
+  private void createNotificationChannel(){
+    if(Build.VERSION.SDK_INT>=26){
+      NotificationChannel channel=new NotificationChannel("reddy_alerts","Reddy notifications",NotificationManager.IMPORTANCE_HIGH);
+      channel.setDescription("Balance, request and admin messages");
+      NotificationManager manager=getSystemService(NotificationManager.class);
+      if(manager!=null)manager.createNotificationChannel(channel);
     }
-
-    private void createNotificationChannel() {
-
-        if (Build.VERSION.SDK_INT >= 26) {
-
-            NotificationChannel channel =
-                new NotificationChannel(
-                    "reddy_alerts",
-                    "Reddy notifications",
-                    NotificationManager.IMPORTANCE_HIGH
-                );
-
-            channel.setDescription(
-                "Balance, request and admin messages"
-            );
-
-            NotificationManager manager =
-                getSystemService(NotificationManager.class);
-
-            if (manager != null) {
-                manager.createNotificationChannel(channel);
-            }
-        }
-    }
-
-    private int dp(int n) {
-        return (int) (
-            n * getResources().getDisplayMetrics().density + .5f
-        );
-    }
-
-    private void showWeb() {
-
-        web = new WebView(this);
-        web.setBackgroundColor(Color.WHITE);
-
-        web.getSettings().setJavaScriptEnabled(true);
-        web.getSettings().setDomStorageEnabled(true);
-        web.getSettings().setDatabaseEnabled(true);
-        web.getSettings().setAllowFileAccess(true);
-        web.getSettings().setAllowContentAccess(true);
-        web.getSettings().setMediaPlaybackRequiresUserGesture(false);
-
-        web.getSettings().setMixedContentMode(
-            WebSettings.MIXED_CONTENT_NEVER_ALLOW
-        );
-
-        CookieManager.getInstance().setAcceptCookie(true);
-
-        CookieManager.getInstance()
-            .setAcceptThirdPartyCookies(web, true);
-
-        web.setWebViewClient(new WebViewClient() {
-
-            @Override
-            public boolean shouldOverrideUrlLoading(
-                WebView v,
-                String url
-            ) {
-
-                if (url.startsWith("https://") ||
-                    url.startsWith("http://")) {
-
-                    v.loadUrl(url);
-                    return true;
-                }
-
-                return false;
-            }
-        });
-
-        web.setWebChromeClient(new WebChromeClient() {
-
-            @Override
-            public boolean onShowFileChooser(
-                WebView v,
-                ValueCallback<Uri[]> cb,
-                FileChooserParams params
-            ) {
-
-                if (uploadCallback != null) {
-                    uploadCallback.onReceiveValue(null);
-                }
-
-                uploadCallback = cb;
-
-                try {
-
-                    startActivityForResult(
-                        params.createIntent(),
-                        PICK_FILE
-                    );
-
-                    return true;
-
-                } catch (Exception ex) {
-
-                    uploadCallback = null;
-                    return false;
-                }
-            }
-
-            @Override
-            public void onPermissionRequest(
-                PermissionRequest request
-            ) {
-                runOnUiThread(() -> request.deny());
-            }
-        });
-
-        root.addView(
-            web,
-            new FrameLayout.LayoutParams(-1, -1)
-        );
-
-        // Load the updated Reddy HTML
-        web.loadUrl("file:///android_asset/index.html");
-    }
-
-    @Override
-    protected void onActivityResult(
-        int request,
-        int result,
-        Intent data
-    ) {
-
-        super.onActivityResult(request, result, data);
-
-        if (request == PICK_FILE && uploadCallback != null) {
-
-            uploadCallback.onReceiveValue(
-                WebChromeClient.FileChooserParams.parseResult(
-                    result,
-                    data
-                )
-            );
-
-            uploadCallback = null;
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-
-        if (web != null && web.canGoBack()) {
-            web.goBack();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-
-        if (web != null) {
-            web.destroy();
-        }
-
-        super.onDestroy();
-    }
+  }
+  private int dp(int n){return (int)(n*getResources().getDisplayMetrics().density+.5f);}
+  private void showWeb(){
+    web=new WebView(this);web.setBackgroundColor(Color.WHITE);web.getSettings().setJavaScriptEnabled(true);
+    web.getSettings().setDomStorageEnabled(true);web.getSettings().setDatabaseEnabled(true);
+    web.getSettings().setAllowFileAccess(false);web.getSettings().setAllowContentAccess(true);
+    web.getSettings().setMediaPlaybackRequiresUserGesture(false);
+    web.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+    CookieManager.getInstance().setAcceptCookie(true);CookieManager.getInstance().setAcceptThirdPartyCookies(web,true);
+    final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
+      .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this)).build();
+    web.setWebViewClient(new WebViewClient(){
+      @Override public WebResourceResponse shouldInterceptRequest(WebView v, WebResourceRequest request){
+        return loader.shouldInterceptRequest(request.getUrl());
+      }
+      @Override public boolean shouldOverrideUrlLoading(WebView v,String url){
+      if(url.startsWith("https://")||url.startsWith("http://")){v.loadUrl(url);return true;}return false;
+    }});
+    web.setWebChromeClient(new WebChromeClient(){
+      @Override public boolean onShowFileChooser(WebView v,ValueCallback<Uri[]> cb,FileChooserParams params){
+        if(uploadCallback!=null)uploadCallback.onReceiveValue(null);uploadCallback=cb;
+        try{startActivityForResult(params.createIntent(),PICK_FILE);return true;}
+        catch(Exception ex){uploadCallback=null;return false;}
+      }
+      @Override public void onPermissionRequest(PermissionRequest request){runOnUiThread(()->request.deny());}
+    });
+    root.addView(web,new FrameLayout.LayoutParams(-1,-1));
+    web.loadUrl("https://appassets.androidplatform.net/assets/index.html");
+  }
+  @Override protected void onActivityResult(int request,int result,Intent data){super.onActivityResult(request,result,data);
+    if(request==PICK_FILE && uploadCallback!=null){uploadCallback.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(result,data));uploadCallback=null;}
+  }
+  @Override public void onBackPressed(){if(web!=null&&web.canGoBack())web.goBack();else super.onBackPressed();}
+  @Override protected void onDestroy(){if(web!=null)web.destroy();super.onDestroy();}
 }
